@@ -1,0 +1,62 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Virtual environment
+venv/
+env/
+RAGvenv/
+
+# Jupyter Notebook checkpoints
+
+.ipynb_checkpoints/
+
+# VSCode settings
+.vscode/
+
+# PyCharm settings
+.idea/
+
+# Local environment variables
+.env
+*.env
+
+# Logs and databases
+*.log
+*.sqlite3
+*.db
+
+# macOS and system files
+.DS_Store
+Thumbs.db
+
+# Compiled files
+*.out
+*.exe
+*.dll
+*.o
+*.a
+
+# Pytest cache
+.pytest_cache/
+
+# Coverage reports
+htmlcov/
+.coverage
+coverage.xml
+
+# Pip & Poetry
+pip-log.txt
+poetry.lock
+
+# Others
+*.bak
+# Large LLM weights
+*.gguf
+mistral-7b-openorca.Q4_K_M.gguf
+
+mistral-7b-openorca.Q4_K_M.gguf

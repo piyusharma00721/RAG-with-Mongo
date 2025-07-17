@@ -1,0 +1,15 @@
+pillow 
+lxml
+langchain
+chromadb
+langchain-community
+langchain-openai
+langchain-groq
+langchain-llama
+langchain-google
+langchain-text-splitters
+langchain-vectorstores
+langchain-document-loaders
+python-dotenv
+sentence-transformers
+langchain-embeddings
