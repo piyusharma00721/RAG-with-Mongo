@@ -36,15 +36,13 @@ class RAGSystem:
         """Initialize MongoDB connection."""
         try:
             import certifi
-            import ssl
             logger.info(f"Attempting connection with URI: {mongodb_uri}")
             self.client = MongoClient(
                 mongodb_uri,
                 tls=True,
                 tlsCAFile=certifi.where(),
                 tlsAllowInvalidCertificates=False,
-                ssl_version=ssl.PROTOCOL_TLSv1_2,
-                serverSelectionTimeoutMS=30000  # Increase to 30 seconds
+                serverSelectionTimeoutMS=30000  # Increased timeout
             )
             self.client.admin.command('ping')
             self.db = self.client["langchain_db"]
