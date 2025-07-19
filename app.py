@@ -35,15 +35,25 @@ class RAGSystem:
     def initialize_database(self, mongodb_uri: str) -> bool:
         """Initialize MongoDB connection."""
         try:
-            self.client = MongoClient(mongodb_uri, serverSelectionTimeoutMS=5000)
+            import certifi
+            import ssl
+            logger.info(f"Attempting connection with URI: {mongodb_uri}")
+            self.client = MongoClient(
+                mongodb_uri,
+                tls=True,
+                tlsCAFile=certifi.where(),
+                tlsAllowInvalidCertificates=False,
+                ssl_version=ssl.PROTOCOL_TLSv1_2,
+                serverSelectionTimeoutMS=30000  # Increase to 30 seconds
+            )
             self.client.admin.command('ping')
             self.db = self.client["langchain_db"]
             self.collection = self.db["local_rag"]
             logger.info("✅ Connected to MongoDB")
             return True
         except Exception as e:
-            logger.error(f"❌ Failed to connect to MongoDB: {e}")
-            st.error(f"Database connection failed: {e}")
+            logger.error(f"❌ Failed to connect to MongoDB: {str(e)} with URI: {mongodb_uri}")
+            st.error(f"Database connection failed: {str(e)}")
             return False
 
     def get_embedding_dimensions(self) -> int:
