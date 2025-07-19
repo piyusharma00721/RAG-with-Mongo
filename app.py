@@ -42,9 +42,10 @@ class RAGSystem:
                 tls=True,
                 tlsCAFile=certifi.where(),
                 tlsAllowInvalidCertificates=False,
-                serverSelectionTimeoutMS=60000,  # Increase to 60 seconds
-                connectTimeoutMS=60000,          # Increase to 60 seconds
-                socketTimeoutMS=60000            # Increase to 60 seconds
+                serverSelectionTimeoutMS=60000,  # Increased timeout
+                connectTimeoutMS=60000,          # Increased timeout
+                socketTimeoutMS=60000,           # Increased timeout
+                ssl_cert_reqs='CERT_REQUIRED'    # Explicitly require certificate validation
             )
             self.client.admin.command('ping')
             self.db = self.client["langchain_db"]
