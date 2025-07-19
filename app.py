@@ -39,8 +39,11 @@ class RAGSystem:
             logger.info(f"Attempting connection with URI: {mongodb_uri}")
             self.client = MongoClient(
                 mongodb_uri,
+                tls=True,
                 tlsCAFile=certifi.where(),
-                serverSelectionTimeoutMS=30000
+                tlsAllowInvalidCertificates=False,
+                serverSelectionTimeoutMS=30000,
+                ssl_cert_reqs='CERT_REQUIRED',  # Explicitly require certificate validation
             )
             self.client.admin.command('ping')
             self.db = self.client["langchain_db"]
