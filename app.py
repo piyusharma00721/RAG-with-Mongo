@@ -42,8 +42,9 @@ class RAGSystem:
                 tls=True,
                 tlsCAFile=certifi.where(),
                 tlsAllowInvalidCertificates=False,
-                serverSelectionTimeoutMS=30000,
-                ssl_cert_reqs='CERT_REQUIRED',  # Explicitly require certificate validation
+                serverSelectionTimeoutMS=60000,  # Increase to 60 seconds
+                connectTimeoutMS=60000,          # Increase to 60 seconds
+                socketTimeoutMS=60000            # Increase to 60 seconds
             )
             self.client.admin.command('ping')
             self.db = self.client["langchain_db"]
@@ -137,7 +138,7 @@ class RAGSystem:
             logger.info(f"✅ Vector index creation command sent for {dimensions} dimensions")
             # Retry verification to account for Atlas delays
             for attempt in range(5):
-                time.sleep(10)  # Wait for index to propagate
+                time.sleep(1)  # Wait for index to propagate
                 if self.check_vector_index():
                     logger.info(f"✅ Vector index verified on attempt {attempt + 1}")
                     return True
