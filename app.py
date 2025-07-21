@@ -204,6 +204,9 @@ Instructions:
   "👋 Hello! I'm here to help you with questions related to your uploaded PDF documents. Please upload a PDF and ask your question."
 - If the user asks a question that is NOT a greeting:
   - Use ONLY the following context to answer.
+  - Be specific and cite relevant information from the context
+  - Keep your answer clear and well-structured
+  - If no PDFs are uploaded, use any previously processed documents to answer
   - If the answer is not found in the context, reply with: "I don't have enough information to answer this question."
   - DO NOT make up answers or respond based on general knowledge.
 
@@ -294,57 +297,57 @@ def process_documents(uploaded_files):
     finally:
         shutil.rmtree(temp_dir, ignore_errors=True)
 
-st.markdown(
-    """
-    <style>
-    /* Apply soft background to whole page */
-    .main {
-        background-color: #f0f2f5 !important;
-    }
+# st.markdown(
+#     """
+#     <style>
+#     /* Apply soft background to whole page */
+#     .main {
+#         background-color: #f0f2f5 !important;
+#     }
 
-    /* Chat area container */
-    .stChatContainer {
-        background-color: rgba(255, 255, 255, 0.7);
-        border-radius: 12px;
-        padding: 20px;
-        margin-top: 10px;
-    }
+#     /* Chat area container */
+#     .stChatContainer {
+#         background-color: rgba(255, 255, 255, 0.7);
+#         border-radius: 12px;
+#         padding: 20px;
+#         margin-top: 10px;
+#     }
 
-    /* Individual message bubble styling */
-    .stChatMessage {
-        background-color: rgba(255, 255, 255, 0.85);
-        color: #000;
-        padding: 12px 18px;
-        border-radius: 10px;
-        margin-bottom: 10px;
-        box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.08);
-        max-width: 90%;
-        word-wrap: break-word;
-    }
+#     /* Individual message bubble styling */
+#     .stChatMessage {
+#         background-color: rgba(255, 255, 255, 0.85);
+#         color: #000;
+#         padding: 12px 18px;
+#         border-radius: 10px;
+#         margin-bottom: 10px;
+#         box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.08);
+#         max-width: 90%;
+#         word-wrap: break-word;
+#     }
 
-    /* Customize user and assistant messages */
-    .stChatMessage.user {
-        background-color: rgba(173, 216, 230, 0.3);
-        margin-left: auto;
-    }
+#     /* Customize user and assistant messages */
+#     .stChatMessage.user {
+#         background-color: rgba(173, 216, 230, 0.3);
+#         margin-left: auto;
+#     }
 
-    .stChatMessage.assistant {
-        background-color: rgba(255, 255, 255, 0.9);
-        margin-right: auto;
-    }
+#     .stChatMessage.assistant {
+#         background-color: rgba(255, 255, 255, 0.9);
+#         margin-right: auto;
+#     }
 
-    /* Scrollbar design */
-    ::-webkit-scrollbar {
-        width: 8px;
-    }
-    ::-webkit-scrollbar-thumb {
-        background-color: #ccc;
-        border-radius: 10px;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
+#     /* Scrollbar design */
+#     ::-webkit-scrollbar {
+#         width: 8px;
+#     }
+#     ::-webkit-scrollbar-thumb {
+#         background-color: #ccc;
+#         border-radius: 10px;
+#     }
+#     </style>
+#     """,
+#     unsafe_allow_html=True
+# )
 
 
 
@@ -476,12 +479,12 @@ def main():
                     st.markdown("I don't have enough information to answer this question.")
                     st.session_state.chat_history.append({"role": "assistant", "content": "I don't have enough information to answer this question."})
 
-        # Add at end of chat rendering
-        st.markdown("<div id='scroll-to-bottom'></div>", unsafe_allow_html=True)
-        st.components.v1.html( # type: ignore
-            "<script>document.getElementById('scroll-to-bottom').scrollIntoView({ behavior: 'smooth' });</script>",
-            height=0
-        )
+        # # Add at end of chat rendering
+        # st.markdown("<div id='scroll-to-bottom'></div>", unsafe_allow_html=True)
+        # st.components.v1.html( # type: ignore
+        #     "<script>document.getElementById('scroll-to-bottom').scrollIntoView({ behavior: 'smooth' });</script>",
+        #     height=0
+        # )
 
     else:
         st.info("👈 Configure and initialize the system using the sidebar")
