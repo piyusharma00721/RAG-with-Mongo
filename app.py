@@ -197,21 +197,23 @@ class RAGSystem:
         try:
             retriever = self.vector_store.as_retriever(search_type="similarity", search_kwargs={"k": top_k})
             custom_prompt = PromptTemplate.from_template("""
-You are a helpful AI assistant. Use the following context to answer the question accurately and concisely.
+You are an AI assistant designed to answer ONLY based on the provided document context or respond politely to greetings.
+
+Instructions:
+- If the user message is a greeting (like "hello", "hi", "good morning", etc.), respond with:
+  "👋 Hello! I'm here to help you with questions related to your uploaded PDF documents. Please upload a PDF and ask your question."
+- If the user asks a question that is NOT a greeting:
+  - Use ONLY the following context to answer.
+  - If the answer is not found in the context, reply with: "I don't have enough information to answer this question."
+  - DO NOT make up answers or respond based on general knowledge.
 
 Context:
 {context}
 
-Question: {question}
+User Input:
+{question}
 
-Instructions:
-- Answer based on the provided context
-- If the information is not in the context, say "I don't have enough information to answer this question"
-- Be specific and cite relevant information from the context
-- Keep your answer clear and well-structured
-- If no PDFs are uploaded, use any previously processed documents to answer
-
-Answer:
+Your Response:
 """)
             def format_docs(docs: List[Document]) -> str:
                 if not docs:
