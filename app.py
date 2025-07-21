@@ -294,43 +294,7 @@ def process_documents(uploaded_files):
     finally:
         shutil.rmtree(temp_dir, ignore_errors=True)
 
-st.markdown(
-    """
-    <style>
-    /* Entire page background */
-    body {
-        background-color: #f5f7fa;
-    }
 
-    /* Chat container background */
-    .stChatMessage {
-        background-color: #ffffff;
-        padding: 12px 16px;
-        border-radius: 10px;
-        margin-bottom: 10px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    }
-
-    /* Chat container outer padding */
-    .stChatContainer {
-        background-color: #e8edf3;
-        padding: 20px;
-        border-radius: 10px;
-        margin-top: 10px;
-    }
-
-    /* Scrollbar customization (optional) */
-    ::-webkit-scrollbar {
-        width: 8px;
-    }
-    ::-webkit-scrollbar-thumb {
-        background-color: #cccccc;
-        border-radius: 10px;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
 
 
 def main():
