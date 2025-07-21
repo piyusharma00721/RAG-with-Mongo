@@ -295,9 +295,9 @@ def process_documents(uploaded_files):
         shutil.rmtree(temp_dir, ignore_errors=True)
 
 def main():
-    st.set_page_config(page_title="RAG Chat with Gemini", page_icon="🤖", layout="wide", initial_sidebar_state="expanded")
-    st.title("🤖 RAG Chat with Gemini AI")
-    st.markdown("Chat with Gemini AI to understand your PDFs")
+    st.set_page_config(page_title="RAG Chat with Kanoon Bot ", page_icon="🤖", layout="wide", initial_sidebar_state="expanded")
+    st.title("🤖 Multi PDF Document RAG Chat with Kanoon Bot")
+    st.markdown("Chat with Kanoon Bot to understand your PDFs")
 
     if 'rag_system' not in st.session_state:
         st.session_state.rag_system = RAGSystem()
@@ -386,50 +386,57 @@ def main():
             unsafe_allow_html=True
         )
 
-        st.subheader("💬 Chat with Gemini")
+        st.subheader("💬 Chat with Kanoon Bot")
         # Display current date and time
         st.caption(f"Date and Time: {fixed_datetime.strftime('%I:%M %p IST on %B %d, %Y (%A)')}")
 
         # Chat container with auto-scroll to bottom
         chat_container = st.container()
         with chat_container:
-            for message in reversed(st.session_state.chat_history):
-                with st.chat_message(message["role"]):
-                    st.write(message["content"])
+            for message in st.session_state.chat_history:
+                if message["role"] == "user":
+                    with st.chat_message("user"):
+                        st.markdown(f"**👤 You:** {message['content']}")
+                elif message["role"] == "assistant":
+                    with st.chat_message("assistant"):
+                        st.markdown(f"**🤖 Kanoon:** {message['content']}")
 
         # Chat input
         if prompt := st.chat_input("Ask a question..."):
             st.session_state.chat_history.append({"role": "user", "content": prompt})
+
             with st.chat_message("user"):
-                st.write(prompt)
+                st.markdown(f"**👤 You:** {prompt}")
 
             with st.chat_message("assistant"):
                 with st.spinner("Thinking..."):
                     answer, sources = st.session_state.rag_system.query_rag(prompt, top_k=5)
                 if answer:
-                    st.write(answer)
+                    st.markdown(f"**🤖 Kanoon:** {answer}")
                     st.session_state.chat_history.append({"role": "assistant", "content": answer})
-                    with st.expander("Source Documents"):
+                    with st.expander("📚 Source Documents"):
                         for i, doc in enumerate(sources):
                             st.write(f"**Source {i+1}: {doc.metadata.get('source_file', 'Unknown')}**")
                             st.write(doc.page_content)
                 else:
-                    st.write("I don't have enough information to answer this question.")
-            # Auto-scroll to the latest message
-            st.rerun()
+                    st.markdown("I don't have enough information to answer this question.")
+                    st.session_state.chat_history.append({"role": "assistant", "content": "I don't have enough information to answer this question."})
+
+        # Add at the end to help simulate scroll-to-bottom
+        # st.markdown("<div id='scroll-to-bottom'></div>", unsafe_allow_html=True)
+        # st.components.v1.html("<script>document.getElementById('scroll-to-bottom').scrollIntoView();</script>", height=0)
 
     else:
         st.info("👈 Configure and initialize the system using the sidebar")
         st.markdown("""
         ### Getting Started:
         1. **Configure MongoDB**: Set MONGODB_URI in secrets or environment variables (e.g., mongodb://localhost:27017/)
-        2. **Set up Gemini API**: Set GEMINI_API_KEY in secrets or environment variables
+        2. **If URI is not handy with you, try my own mongo URI
         3. **Initialize System**: Click the initialize button
         4. **Upload PDFs**: Use the document upload section in the sidebar
         5. **Ask Questions**: Start chatting in the main area
         ### Troubleshooting:
         - Ensure MongoDB is accessible and the URI is correct
-        - Verify Gemini API key is valid
         - If you see a dimension mismatch error, use the 'Clear Collection' button in the sidebar, or drop the 'local_rag' collection in MongoDB. Run: `db.local_rag.drop()` in mongosh
         - If index creation fails, ensure MongoDB version is 6.0+ and supports vector search. Check user permissions and network access.
         """)
