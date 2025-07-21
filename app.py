@@ -294,6 +294,45 @@ def process_documents(uploaded_files):
     finally:
         shutil.rmtree(temp_dir, ignore_errors=True)
 
+st.markdown(
+    """
+    <style>
+    /* Entire page background */
+    body {
+        background-color: #f5f7fa;
+    }
+
+    /* Chat container background */
+    .stChatMessage {
+        background-color: #ffffff;
+        padding: 12px 16px;
+        border-radius: 10px;
+        margin-bottom: 10px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Chat container outer padding */
+    .stChatContainer {
+        background-color: #e8edf3;
+        padding: 20px;
+        border-radius: 10px;
+        margin-top: 10px;
+    }
+
+    /* Scrollbar customization (optional) */
+    ::-webkit-scrollbar {
+        width: 8px;
+    }
+    ::-webkit-scrollbar-thumb {
+        background-color: #cccccc;
+        border-radius: 10px;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+
 def main():
     st.set_page_config(page_title="RAG Chat with Kanoon Bot ", page_icon="🤖", layout="wide", initial_sidebar_state="expanded")
     st.title("🤖 Multi PDF Document RAG Chat with Kanoon Bot")
@@ -414,10 +453,10 @@ def main():
                 if answer:
                     st.markdown(f"**🤖 Kanoon:** {answer}")
                     st.session_state.chat_history.append({"role": "assistant", "content": answer})
-                    with st.expander("📚 Source Documents"):
-                        for i, doc in enumerate(sources):
-                            st.write(f"**Source {i+1}: {doc.metadata.get('source_file', 'Unknown')}**")
-                            st.write(doc.page_content)
+                    # with st.expander("📚 Source Documents"):
+                        # for i, doc in enumerate(sources):
+                        #     st.write(f"**Source {i+1}: {doc.metadata.get('source_file', 'Unknown')}**")
+                        #     st.write(doc.page_content)
                 else:
                     st.markdown("I don't have enough information to answer this question.")
                     st.session_state.chat_history.append({"role": "assistant", "content": "I don't have enough information to answer this question."})
