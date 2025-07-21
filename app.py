@@ -191,13 +191,41 @@ class RAGSystem:
         return total_docs
 
     def query_rag(self, question: str, top_k: int = 5) -> Tuple[Optional[str], List[Document]]:
-        """Query the RAG system."""
+        """Query the RAG system with greeting handling."""
         if not self.vector_store or not self.llm:
             raise ValueError("System not fully initialized")
-        try:
-            retriever = self.vector_store.as_retriever(search_type="similarity", search_kwargs={"k": top_k})
-            custom_prompt = PromptTemplate.from_template("""
-You are a helpful AI assistant. Use the following context to answer the question accurately and concisely.
+
+        # List of greeting phrases (case-insensitive)
+        greetings = [
+            "hello", "hi", "hey", "greetings", "good morning", "good afternoon",
+            "good evening", "how are you", "nice to meet you"
+        ]
+
+        # Check if the question is a greeting
+        question_lower = question.lower()
+        is_greeting = any(greeting in question_lower for greeting in greetings)
+
+        if is_greeting:
+            # Return predefined greeting responses
+            greeting_responses = {
+                "hello": "Hello! How can I assist you today?",
+                "hi": "Hi there! What would you like to know?",
+                "hey": "Hey! I'm here to help with your PDFs.",
+                "greetings": "Greetings! Feel free to ask about your documents.",
+                "good morning": "Good morning! Ready to explore your PDFs?",
+                "good afternoon": "Good afternoon! How can I help with your files?",
+                "good evening": "Good evening! Let's dive into your documents.",
+                "how are you": "I'm doing great, thanks! How can I assist with your PDFs?",
+                "nice to meet you": "Nice to meet you too! Ask me anything about your uploaded PDFs."
+            }
+            response = next((greeting_responses.get(g) for g in greetings if g in question_lower), "Hello! How can I assist you today?")
+            return response, []
+        else:
+
+            try:
+                retriever = self.vector_store.as_retriever(search_type="similarity", search_kwargs={"k": top_k})
+                custom_prompt = PromptTemplate.from_template("""
+You are a helpful AI assistant. Use ONLY the following context from uploaded PDFs to answer the question accurately and concisely. Do NOT use any external knowledge or assumptions.
 
 Context:
 {context}
@@ -205,50 +233,50 @@ Context:
 Question: {question}
 
 Instructions:
-- Answer based on the provided context
-- If the information is not in the context, say "I don't have enough information to answer this question"
+- Answer based ONLY on the provided context from uploaded PDFs
+- If the information is not in the context, say "I don't have enough information from the uploaded PDFs to answer this question"
 - Be specific and cite relevant information from the context
 - Keep your answer clear and well-structured
-- If no PDFs are uploaded, use any previously processed documents to answer
 
 Answer:
-""")
-            def format_docs(docs: List[Document]) -> str:
-                if not docs:
-                    return "No relevant documents found."
-                formatted = []
-                for i, doc in enumerate(docs[:top_k]):
-                    source = doc.metadata.get('source_file', 'Unknown')
-                    content = doc.page_content.strip()
-                    formatted.append(f"Document {i+1} (Source: {source}):\n{content}")
-                return "\n\n".join(formatted)
-            
-            rag_chain = (
-                {"context": retriever | format_docs, "question": RunnablePassthrough()}
-                | custom_prompt
-                | self.llm
-                | StrOutputParser()
-            )
-            start_time = time.time()
-            answer = rag_chain.invoke(question)
-            response_time = time.time() - start_time
-            source_docs = retriever.invoke(question)
-            logger.info(f"✅ Query processed in {response_time:.2f}s")
-            return answer, source_docs[:top_k]
-        except Exception as e:
-            if "vector field is indexed with" in str(e).lower() and "dimensions but queried with" in str(e).lower():
-                error_msg = (
-                    f"❌ Dimension mismatch detected: {str(e)}. "
-                    "Use the 'Clear Collection' button in the sidebar to reset the database, "
-                    "or in MongoDB, drop the 'local_rag' collection. "
-                    "Run: `db.local_rag.drop()` in mongosh."
+""")           
+
+                def format_docs(docs: List[Document]) -> str:
+                    if not docs:
+                        return "No relevant documents found in uploaded PDFs."
+                    formatted = []
+                    for i, doc in enumerate(docs[:top_k]):
+                        source = doc.metadata.get('source_file', 'Unknown')
+                        content = doc.page_content.strip()
+                        formatted.append(f"Document {i+1} (Source: {source}):\n{content}")
+                    return "\n\n".join(formatted)
+                
+                rag_chain = (
+                    {"context": retriever | format_docs, "question": RunnablePassthrough()}
+                    | custom_prompt
+                    | self.llm
+                    | StrOutputParser()
                 )
-                logger.error(error_msg)
-                st.error(error_msg)
+                start_time = time.time()
+                answer = rag_chain.invoke(question)
+                response_time = time.time() - start_time
+                source_docs = retriever.invoke(question)
+                logger.info(f"✅ Query processed in {response_time:.2f}s")
+                return answer, source_docs[:top_k]
+            except Exception as e:
+                if "vector field is indexed with" in str(e).lower() and "dimensions but queried with" in str(e).lower():
+                    error_msg = (
+                        f"❌ Dimension mismatch detected: {str(e)}. "
+                        "Use the 'Clear Collection' button in the sidebar to reset the database, "
+                        "or in MongoDB, drop the 'local_rag' collection. "
+                        "Run: `db.local_rag.drop()` in mongosh."
+                    )
+                    logger.error(error_msg)
+                    st.error(error_msg)
+                    return None, []
+                logger.error(f"❌ Error during RAG query: {e}")
+                st.error(f"Query failed: {e}")
                 return None, []
-            logger.error(f"❌ Error during RAG query: {e}")
-            st.error(f"Query failed: {e}")
-            return None, []
 
 def load_config():
     """Load configuration from Streamlit secrets or environment variables."""
