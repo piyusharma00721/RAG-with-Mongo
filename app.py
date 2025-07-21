@@ -311,8 +311,8 @@ def main():
     if 'chat_history' not in st.session_state:
         st.session_state.chat_history = []
 
-    # Set a fixed date and time for this session (05:38 PM IST, July 18, 2025)
-    fixed_datetime = datetime(2025, 7, 18, 17, 38)  # 05:38 PM IST
+    # # Set a fixed date and time for this session (05:38 PM IST, July 18, 2025)
+    # fixed_datetime = datetime(2025, 7, 18, 17, 38)  # 05:38 PM IST
 
     with st.sidebar:
         st.header("🔧 System Configuration")
@@ -389,9 +389,9 @@ def main():
             unsafe_allow_html=True
         )
 
-        st.subheader("💬 Chat with Kanoon Bot")
+        # st.subheader("💬 Chat with Kanoon Bot")
         # Display current date and time
-        st.caption(f"Date and Time: {fixed_datetime.strftime('%I:%M %p IST on %B %d, %Y (%A)')}")
+        # st.caption(f"Date and Time: {fixed_datetime.strftime('%I:%M %p IST on %B %d, %Y (%A)')}")
 
         # Chat container with auto-scroll to bottom
         chat_container = st.container()
@@ -417,10 +417,10 @@ def main():
                 if answer:
                     st.markdown(f"**🤖 Kanoon:** {answer}")
                     st.session_state.chat_history.append({"role": "assistant", "content": answer})
-                    # with st.expander("📚 Source Documents"):
-                        # for i, doc in enumerate(sources):
-                        #     st.write(f"**Source {i+1}: {doc.metadata.get('source_file', 'Unknown')}**")
-                        #     st.write(doc.page_content)
+                    with st.expander("📚 Source Documents"):
+                        for i, doc in enumerate(sources):
+                            st.write(f"**Source {i+1}: {doc.metadata.get('source_file', 'Unknown')}**")
+                            st.write(doc.page_content)
                 else:
                     st.markdown("I don't have enough information to answer this question.")
                     st.session_state.chat_history.append({"role": "assistant", "content": "I don't have enough information to answer this question."})
